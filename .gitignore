@@ -1,0 +1,7 @@
+# Ignore everything
+*
+
+# But not these file
+!.gitignore
+# Not anything in srs that end in .java
+!./src/*.java
