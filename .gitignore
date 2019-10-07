@@ -1,3 +1,4 @@
-
-/out/
-/.idea/
+# Ignoring everything
+*
+# Excepth the .java files in my srs directory
+!/src/*.java
