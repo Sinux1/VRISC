@@ -3,5 +3,6 @@
 
 # But not these file
 !.gitignore
+!*.java
 # Not anything in srs that end in .java
-!./src/
+
