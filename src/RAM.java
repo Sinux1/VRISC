@@ -12,6 +12,7 @@ public class RAM{
 
 
     public void setMode(boolean mode){
+
         isWriteMode = mode;
     }
 

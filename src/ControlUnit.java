@@ -16,11 +16,12 @@ public class ControlUnit {
     private byte dataRegister1 = 0;
     final boolean READ = false;
     final boolean WRITE = !READ;
+    int runningCount = 0;
 
     // Constructor
     public ControlUnit(){
-        ALU alu = new ALU();
-        RAM ram = new RAM();
+        alu = new ALU();
+        ram = new RAM();
 
     }
 
@@ -107,7 +108,7 @@ public class ControlUnit {
     }
 
     private void load(){
-
+        System.out.println();
 
     }
 
@@ -124,9 +125,7 @@ public class ControlUnit {
     }
 
     private void jumpIfEqual(){
-        if(alu.getZero()){
-            programCounter = operandRegister;
-        }
+
 
     }
 
@@ -144,6 +143,15 @@ public class ControlUnit {
     }
 
     public String toString(){
+        String formatString = "%5s %-8s %7s %-8 %12s %-8s %n%5s %-8s %7s %-8 %12s %-8s %n";
+        System.out.printf("%5s %-8s %7s %-8 %12s %-8s %n%5s %-8s %7s %-8 %12s %-8s %n",
+                "IR: ", Integer.toString(instructionRegister),
+                "OPR: ", Integer.toString(operandRegister),
+                "PC: ", Integer.toString(programCounter),
+                "MAR: " , Integer.toString(memoryAddressRegister),
+                "MBR: ", Integer.toString(memoryBufferRegister),
+                "Accumulator: ", Integer.toString(accumulator));
+
 
         return "";
     }
@@ -152,6 +160,12 @@ public class ControlUnit {
         System.out.println("WTF, crae crae");
         ControlUnit cu = new ControlUnit();
         while(!(cu.isStopped)) {
+            cu.fetchInstruction();
+            cu.toString();
+            cu.decodeInstruction();
+            cu.toString();
+            cu.execute();
+            cu.toString();
 
         }
 
