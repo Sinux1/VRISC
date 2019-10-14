@@ -1,5 +1,7 @@
 import jdk.dynalink.linker.MethodTypeConversionStrategy;
 
+import javax.swing.event.ListDataEvent;
+
 public class RAM{
 
     private boolean isWriteMode = false;
@@ -12,21 +14,21 @@ public class RAM{
 
 
     public void setMode(boolean mode){
-
         isWriteMode = mode;
     }
 
     public byte readByte(byte address){
+        // Must create a custom exception
         return memory[address];
+
 
     }
 
     public void writeByte(byte address, byte value){
-
         if(isWriteMode){
             memory[address] = value;
         }
-        setMode((false));
+
 
     }
 
