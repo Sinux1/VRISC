@@ -38,7 +38,7 @@ public class ControlUnit {
     // Methods
     // Fetch instruction reads an instruction from the address pointed to by the
     // PC amd places it into the IR by way of the MAR and MBR, and increments the PC
-    private void fetchInstruction() {
+    private void fetchInstruction() throws RAM.ModeMismatchException {
         // Place address in PC into MBR
         memoryAddressRegister = programCounter;
 
@@ -54,7 +54,7 @@ public class ControlUnit {
 
     }
 
-    private void decodeInstruction() {
+    private void decodeInstruction() throws RAM.ModeMismatchException {
 
         // Update isDirect - instructions with binary values less that 8 and are odd
         // are instructions in immediate mode, else they are in direct mode
@@ -86,7 +86,7 @@ public class ControlUnit {
 
     // Straight forward, retrieves the operand from memory and places
     // it in corresponding register
-    private void fetchOperand() {
+    private void fetchOperand() throws RAM.ModeMismatchException {
         memoryAddressRegister = dataRegister1;
         ram.setMode(READ);
         memoryBufferRegister = ram.readByte(memoryAddressRegister);
@@ -95,7 +95,7 @@ public class ControlUnit {
     }
 
     // Using a series of switch statements for determining method call for instruction
-    private void execute() {
+    private void execute() throws RAM.ModeMismatchException {
         if (instructionRegister == 0) {
             stop();
         } else if (instructionRegister == 2 || instructionRegister == 3) {
@@ -134,7 +134,7 @@ public class ControlUnit {
     }
 
 
-    private void store() {
+    private void store() throws RAM.ModeMismatchException {
         if (isDebug) {
             System.out.println("STORE");
 
@@ -213,23 +213,24 @@ public class ControlUnit {
         return "";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws RAM.ModeMismatchException {
         ControlUnit cu = new ControlUnit();
         System.out.println(cu.ram.memory.length);
         cu.isDebug = true;
         while (!(cu.isStopped)) {
             System.out.println("FETCHING ");
             cu.fetchInstruction();
-            System.out.println(cu);
+
             // decodeInstruction calls fetchOperand if appropriate
             cu.decodeInstruction();
-            System.out.println(cu);
+
             cu.execute();
             System.out.println(cu);
 
 
 
         }
+        cu.ram.toString();
 
 
 
