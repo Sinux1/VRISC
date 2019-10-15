@@ -62,7 +62,7 @@ public class ALU{
             case (1):
                 add();
                 break;
-            case (3):
+            case (2):
                 compare();
                 break;
 
@@ -75,15 +75,10 @@ public class ALU{
         isOverflow = false;
         isCarry = false;
         output = (byte)(leftOperand + rightOperand);
-        char msbL = Integer.toBinaryString(leftOperand).charAt(0);
-        char msbR = Integer.toBinaryString(rightOperand).charAt(0);
-        char msbO = Integer.toBinaryString(output).charAt(0);
-        if((msbL==msbR) && (msbL!=msbO)){
-            isOverflow = true;
-        }
         String lO = toByteString(leftOperand);
         String rO = toByteString(rightOperand);
         isCarry = calculateCarry(lO, rO);
+        calculateOverflow();
         setNZFlags();
 
 
@@ -91,6 +86,7 @@ public class ALU{
     }
 
     private void compare(){
+        calculateOverflow();
         int right = rightOperand;
         right = -right;
         rightOperand = (byte)right;
@@ -98,7 +94,22 @@ public class ALU{
 
     }
 
-    public void passThrough(){
+    private boolean calculateOverflow() {
+        isOverflow = false;
+        byte a = leftOperand;
+        byte b = rightOperand;
+        byte c = (byte) (a + b);
+        if( ((a < 0) && (b < 0) && c > 0) || ((a > 0) && (b > 0) && (c < 0))) {
+            return true;
+
+        }
+        else{
+            return false;
+        }
+
+    }
+
+    private void passThrough(){
         output = leftOperand;
         setNZFlags();
 
@@ -118,7 +129,7 @@ public class ALU{
 
     // Helper method - sign extends BinaryString of positive numbers to byte size
     // and shortens negative numbers to byte size for bitwise comparison when calculating carry out flag
-    public String toByteString ( byte byt){
+    private String toByteString ( byte byt){
         String bin_b = Integer.toBinaryString(byt);
 
         if (bin_b.length() > 8){
@@ -137,9 +148,9 @@ public class ALU{
 
     // Calculates the carry out by comparing the 2 bytes bitwise
     // Starting with a carry of zero, if the sum of the carry and
-    // and the corresponding column is greater than 1 then there
-    // is a carry over to the next column, for eight columns.
-    public boolean calculateCarry(String b1, String b2) {
+    // and the 2 bits from the corresponding column is greater than 1,
+    // there is a carry over to the next column, for eight columns.
+    private boolean calculateCarry(String b1, String b2) {
         int carry = 0;
         for (int i = 7; i >= 0; i--) {
             int c1 = Character.getNumericValue(b1.charAt(i));
