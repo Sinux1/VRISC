@@ -58,10 +58,10 @@ public class ControlUnit {
 
         // Update isDirect - instructions with binary values less that 8 and are odd
         // are instructions in immediate mode, else they are in direct mode
-        isDirect = ((instructionRegister < 8) && ((instructionRegister % 2) == 1));
+        isDirect = ((instructionRegister < 8 || instructionRegister == 13) && ((instructionRegister % 2) == 1));
 
         // If a binary instruction, fetch operand
-        if ((instructionRegister > 0 && instructionRegister < 12)) {
+        if ((instructionRegister > 0 && instructionRegister < 14)) {
             // Place address in PC into MAR
             memoryAddressRegister = programCounter;
 
@@ -115,6 +115,8 @@ public class ControlUnit {
         } else if (instructionRegister == 11) {
             jumpIfGreaterThan();
 
+        }else if(instructionRegister == 12 || instructionRegister == 13){
+            add();
         }
 
 
@@ -124,78 +126,59 @@ public class ControlUnit {
     // which then sends it through to output. The accumulator
     // stores the result from output
     private void load() {
-        if (isDebug) {
-            System.out.println("LOAD");
-        }
+        if (isDebug) { System.out.println("LOAD"); }
         alu.setControlSignal(PASS);
         accumulator = alu.setLeftOperand(operandRegister);
-
-
     }
 
 
     private void store() throws RAM.ModeMismatchException {
-        if (isDebug) {
-            System.out.println("STORE");
-
-        }
+        if (isDebug) { System.out.println("STORE"); }
         ram.setMode(WRITE);
         ram.writeByte(operandRegister, accumulator);
     }
+    private void add(){
+        if(isDebug){ System.out.println("ADD"); }
+        // Sets control signal for ADD
+        alu.setControlSignal(ADD);
+        // Placing the accumulator value into the left operand
+        // will not execute the instruction if ADD control signal is set
+        // but setting the right operand will
+        alu.setLeftOperand(accumulator);
+        alu.setRightOperand(operandRegister);
+        // The sum is placed in the accumulator
+        accumulator = alu.getOutput();
+    }
 
     private void compare() {
-        if (isDebug) {
-            System.out.println("Compare");
-
-        }
+        if (isDebug) { System.out.println("Compare"); }
         alu.setControlSignal(COMPARE);
         alu.setRightOperand(operandRegister);
     }
 
     private void jump() {
-        if (isDebug) {
-            System.out.println("JUMP");
-        }
+        if (isDebug) { System.out.println("JUMP"); }
         programCounter = operandRegister;
     }
 
     private void jumpIfEqual() {
-        if (isDebug) {
-            System.out.println("JUMPEQ");
-        }
-        if (alu.getZero()) {
-            programCounter = operandRegister;
-        }
+        if (isDebug) { System.out.println("JUMPEQ"); }
+        if (alu.getZero()) { programCounter = operandRegister; }
     }
 
     private void jumpIfGreaterThan() {
-        if (isDebug) {
-            System.out.println("JUMPGT");
-        }
-        if((alu.getNegative() && !alu.getOverflow()) || !alu.getNegative() && alu.getOverflow() )
-        {
-            programCounter = operandRegister;
-        }
-
-
-
-
+        if (isDebug) { System.out.println("JUMPGT");}
+        if(alu.getNegative() == alu.getOverflow()) { programCounter = operandRegister; }
     }
 
     private void jumpIfLessThan() {
-        if (isDebug) {
-            System.out.println("JUMPLT");
-        }
-        if ((!(alu.getOverflow() && alu.getNegative()) || (alu.getNegative() && alu.getOverflow()))){
-            programCounter = operandRegister;
-        }
+        if (isDebug) { System.out.println("JUMPLT"); }
+        if (alu.getNegative() != alu.getOverflow()){ programCounter = operandRegister; }
     }
 
     private void stop() {
         isStopped = true;
-        if (isDebug) {
-            System.out.println("STOP");
-        }
+        if (isDebug) { System.out.println("STOP"); }
 
     }
 
@@ -208,8 +191,6 @@ public class ControlUnit {
                 "MAR: ", Byte.toString(memoryAddressRegister),
                 "MBR: ", Byte.toString(memoryBufferRegister),
                 "Accumulator:", Byte.toString(accumulator));
-
-
         return "";
     }
 
@@ -220,15 +201,10 @@ public class ControlUnit {
         while (!(cu.isStopped)) {
             System.out.println("FETCHING ");
             cu.fetchInstruction();
-
             // decodeInstruction calls fetchOperand if appropriate
             cu.decodeInstruction();
-
             cu.execute();
             System.out.println(cu);
-
-
-
         }
         cu.ram.toString();
 

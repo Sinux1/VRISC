@@ -36,7 +36,7 @@ public class ALU{
     public byte setLeftOperand(byte operand)
     {
         leftOperand = operand;
-        execute();
+        if(controlSignal != 1){ execute();}
         return leftOperand;
     }
 
