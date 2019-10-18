@@ -94,6 +94,7 @@ public class ALU{
         right = -right;
         rightOperand = (byte)right;
         add();
+        rightOperand = (byte)-right;
 
     }
         // calculateOverflow uses the sign extended byte size binary string
@@ -167,6 +168,25 @@ public class ALU{
         }
         return (carry == 1);
     }
+
+    public String toString(){
+        String formatString = "%-8s %-1s %-8s %-1s %-8s %-1s %-8s %-5s %12s %3s %8s %3s %8s %3s %n";
+        System.out.printf(formatString,
+                "Flag N:", getNegative()+"|",
+                "Flag V:", getOverflow()+"|",
+                "Flag Z:", getZero()+"|",
+                "Flag C:", getCarry()+"|",
+                "Control Signal:", controlSignal+"|",
+                "Left Op:", leftOperand+"|",
+                "Right Op:", rightOperand+"|");
+        return"";
+    }
+
+    //Return 1 if true, 0 if false
+    public String flagToInt(boolean b){ return (b)? "1" : "0"; }
+    public String retControlSig(int s){return (controlSignal==0)? "Pass Through":
+            (controlSignal == 1)? "Add":
+                    "Compare";}
 
 
 }

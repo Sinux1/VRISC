@@ -58,7 +58,7 @@ public class ControlUnit {
 
         // Update isDirect - instructions with binary values less that 8 and are odd
         // are instructions in immediate mode, else they are in direct mode
-        isDirect = ((instructionRegister < 8 || instructionRegister == 13) && ((instructionRegister % 2) == 1));
+        isDirect = ((instructionRegister < 8 ) && ((instructionRegister % 2) == 1) || instructionRegister == 13);
 
         // If a binary instruction, fetch operand
         if ((instructionRegister > 0 && instructionRegister < 14)) {
@@ -126,19 +126,19 @@ public class ControlUnit {
     // which then sends it through to output. The accumulator
     // stores the result from output
     private void load() {
-        if (isDebug) { System.out.println("LOAD"); }
+        if (isDebug) { System.out.println("LOAD Instruction"); }
         alu.setControlSignal(PASS);
         accumulator = alu.setLeftOperand(operandRegister);
     }
 
 
     private void store() throws RAM.ModeMismatchException {
-        if (isDebug) { System.out.println("STORE"); }
+        if (isDebug) { System.out.println("STORE Instruction"); }
         ram.setMode(WRITE);
         ram.writeByte(operandRegister, accumulator);
     }
     private void add(){
-        if(isDebug){ System.out.println("ADD"); }
+        if(isDebug){ System.out.println("ADD Instruction"); }
         // Sets control signal for ADD
         alu.setControlSignal(ADD);
         // Placing the accumulator value into the left operand
@@ -151,58 +151,66 @@ public class ControlUnit {
     }
 
     private void compare() {
-        if (isDebug) { System.out.println("Compare"); }
+        if (isDebug) { System.out.println("Instruction: Compare"); }
         alu.setControlSignal(COMPARE);
         alu.setRightOperand(operandRegister);
     }
 
     private void jump() {
-        if (isDebug) { System.out.println("JUMP"); }
+        if (isDebug) { System.out.println("Instruction: JUMP"); }
         programCounter = operandRegister;
     }
 
     private void jumpIfEqual() {
-        if (isDebug) { System.out.println("JUMPEQ"); }
+        if (isDebug) { System.out.println("Instruction: JUMPEQ"); }
         if (alu.getZero()) { programCounter = operandRegister; }
     }
 
     private void jumpIfGreaterThan() {
-        if (isDebug) { System.out.println("JUMPGT");}
+        if (isDebug) { System.out.println("Instruction: JUMPGT");}
         if(alu.getNegative() == alu.getOverflow()) { programCounter = operandRegister; }
     }
 
     private void jumpIfLessThan() {
-        if (isDebug) { System.out.println("JUMPLT"); }
+        if (isDebug) { System.out.println("Instruction: JUMPLT"); }
         if (alu.getNegative() != alu.getOverflow()){ programCounter = operandRegister; }
     }
 
     private void stop() {
         isStopped = true;
-        if (isDebug) { System.out.println("STOP"); }
+        if (isDebug) { System.out.println("Instruction: STOP"); }
 
     }
 
     public String toString() {
-        String formatString = "%5s %-8s %7s %-8s %12s %-8s %n%5s %-8s %7s %-8s %12s %-8s %n";
+        String a_mode = (isDirect)? "Direct": "Immediate";
+        String formatString = "%-16s %-9s%n%-5s %-3s %5s %-3s %5s %-3s %5s %-3s %5s %-3s %12s %-3s %n";
         System.out.printf(formatString,
-                "IR: ", Byte.toString(instructionRegister),
-                "OPR: ", Byte.toString(operandRegister),
-                "PC: ", Byte.toString(programCounter),
-                "MAR: ", Byte.toString(memoryAddressRegister),
-                "MBR: ", Byte.toString(memoryBufferRegister),
-                "Accumulator:", Byte.toString(accumulator));
+                "Addressing Mode: ", a_mode,
+                "IR: ", Byte.toString(instructionRegister)+"|",
+                "OPR: ", Byte.toString(operandRegister)+"|",
+                "PC: ", Byte.toString(programCounter)+"|",
+                "MAR: ", Byte.toString(memoryAddressRegister)+"|",
+                "MBR: ", Byte.toString(memoryBufferRegister)+"|",
+                "Accumulator: ", Byte.toString(accumulator)+"|"
+                );
+        System.out.println(alu);
+
         return "";
     }
 
     public static void main(String[] args) throws RAM.ModeMismatchException {
         ControlUnit cu = new ControlUnit();
-        System.out.println(cu.ram.memory.length);
         cu.isDebug = true;
         while (!(cu.isStopped)) {
-            System.out.println("FETCHING ");
+            System.out.println("Fetch... ");
             cu.fetchInstruction();
+            System.out.println(cu);
+            System.out.println("Decode....");
             // decodeInstruction calls fetchOperand if appropriate
             cu.decodeInstruction();
+            System.out.println(cu);
+            System.out.println("Executing.....");
             cu.execute();
             System.out.println(cu);
         }
