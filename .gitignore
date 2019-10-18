@@ -2,3 +2,4 @@
 *
 # Excepth the .java files in my srs directory
 !/src/*.java
+!/*.mem

@@ -1,0 +1,42 @@
+Sum for lab 6
+Written by Sam Mazarei Comp 262 sec002
+This code will take the sum of the first 15 integers
+and then store the result in memory[101]
+
+%
+// Sums of the first 15 integers
+// All ADD in immediate mode
+0: 0000 1100 // ADD, i
+1: 0000 0001 // 1
+2: 0000 1100 // ADD, i
+3: 0000 0010 // 2
+4: 0000 1100 // ADD, i
+5: 0000 0011 // 3
+6: 0000 1100 // ADD, i
+7: 0000 0100 // 4
+8: 0000 1100 // ADD, i
+9: 0000 0101 // 5
+10: 0000 1100 // ADD, i
+11: 0000 0110 // 6
+12: 0000 1100 // ADD, i
+13: 0000 0111 // 7
+14: 0000 1100 // ADD, i
+15: 0000 1000 // 8
+16: 0000 1100 // ADD, i
+17: 0000 1001 // 9
+18: 0000 1100 // ADD, i
+19: 0000 1010 // 10 
+20: 0000 1100 // ADD, i
+21: 0000 1011 // 11
+22: 0000 1100 // ADD, i
+23: 0000 1100 // 12
+24: 0000 1100 // ADD, i
+25: 0000 1101 // 13
+26: 0000 1100 // ADD, i
+27: 0000 1110 // 14
+28: 0000 1100 // ADD, i
+29: 0000 1111 // 15
+// The result is placed in mnemory[101]
+// STORE,i
+30: 0000 0100 // STORE, i
+31: 0110 0101 // 101
